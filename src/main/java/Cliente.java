@@ -188,9 +188,10 @@ public class Cliente extends HttpServlet
 					"<label>[Senha]:</label>&emsp;"+
 					"<input type='password' name='inSenha'><br><br>"+
 					"<input type='hidden' name='cadastroOk' value='true'>"+
-					"<input type=\"checkbox\" name=\"Gerencia\"><label>Gerente</label><br><br>"+
+					""+
 					"<input type='submit' name='cadastrar' value='Cadastrar'>"+
-				"</form>"+
+				"</form><br>"+
+				"<h3>"+pageSession.getAttribute("msg")+"</h3>"+
 				"</div>";
 	}
 	private void setPageLogin()
@@ -211,7 +212,8 @@ public class Cliente extends HttpServlet
 						"<input type=\"password\" name=\"inSenha\"><br><br>"+
 						"<input type=\"hidden\" name=\"loginOk\" value=\"true\">"+
 						"<input type=\"submit\" name=\"logar\" value=\"Login\">"+
-					"</form>"+
+					"</form><br>"+
+					"<h3>"+pageSession.getAttribute("msg")+"</h3>"+
 					"</div>"+
 					"<h3 style='color:red; margin-left: 6.5%;'></h3>";
 		}
@@ -423,7 +425,7 @@ public class Cliente extends HttpServlet
 	private void setPageSistema()
 	{
 		pageSession.setAttribute("TimeToRefresh", 9999999);
-		Site = "";
+		Site = "<h3>"+pageSession.getAttribute("msg")+"</h3>";
 		pageSession.setAttribute("Titulo", "Sistema");	
 		Site += "<form method=\"post\" action=\"Cliente\"><input name=\"actrs\" type=\"hidden\" value=\"rt\"><input type=\"submit\" value=\"Reiniciar Sistema\"></form>"+
 				"<form method=\"post\" action=\"Cliente\"><input name=\"actrc\" type=\"hidden\" value=\"rt\"><input type=\"submit\" value=\"Reiniciar Contagem\"></form>";
@@ -431,7 +433,8 @@ public class Cliente extends HttpServlet
 		{
 			Senha satual = (Senha)pageSession.getAttribute("senhaChamada");
 			Site +="<h3>Senha: "+satual.getSenha()+" Info: " +satual.getInfo()+"</h3>";
-			Site +="<form method='post' action='Cliente'><input name='actm' type='hidden' value='m'><input type='submit' value='Cliente ausente'></form>";
+			Site +="<form method='post' action='Cliente'><input name='actm' type='hidden' value='m'><input type='submit' value='Cliente ausente'></form><br>"+
+					"<h3>"+pageSession.getAttribute("msg")+"<\\h3>";
 		}
 		else
 		{

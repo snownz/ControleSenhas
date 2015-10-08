@@ -30,8 +30,7 @@ public class Server extends HttpServlet
 	HttpSession pageSession;	
 	PageContext pageContext;
 	
-	String path = "";
-	
+	String path = "";	
 	private void initVar(HttpServletRequest request, HttpServletResponse response)
 	{
 		pageSession = request.getSession();
@@ -39,6 +38,7 @@ public class Server extends HttpServlet
 	    path = (String)pageSession.getAttribute("startUpPath");
 	    sl = (Login)pageSession.getAttribute("Login");
 	    s  = (Senha)pageSession.getAttribute("Senha");
+	    pageSession.setAttribute("msg", "");
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
@@ -200,7 +200,7 @@ public class Server extends HttpServlet
 		gl = (GerenciaLogin) pageContext.getAttribute("gerenciaLogin", pageContext.APPLICATION_SCOPE);
 		if(gl == null)
 		{
-			File f = new File(path + "gerenciaLogin.ser");
+			File f = new File(path + "controleUsuarios.ser");
 			if(!f.exists())
 			{
 				gl = GerenciaLogin.getInstancia();
@@ -208,7 +208,7 @@ public class Server extends HttpServlet
 			}
 			else
 			{
-				gl = (GerenciaLogin) SalvarRecuperarDados.Recuperar(path + "gerenciaLogin.ser");
+				gl = (GerenciaLogin) SalvarRecuperarDados.Recuperar(path + "controleUsuarios.ser");
 				if(gl == null)
 				{
 					f.delete();
@@ -250,8 +250,7 @@ public class Server extends HttpServlet
 	{
 		SalvarRecuperarDados.Salvar(path+"controleUsuarios.ser", gl);
 	}
-	
-	
+		
 	private void cadastrar(String Login, String Senha, boolean gerencia) throws IOException
 	{
 		Login l = new Login();
@@ -259,7 +258,11 @@ public class Server extends HttpServlet
 		l.setNome(Login);
 		l.setSenha(Senha);
 		l.setGerente(gerencia);
-		gl.addLogin(l);		
+		if(gl.addLogin(l))
+			pageSession.setAttribute("msg", "Usuario Cadastrado com Sucesso!");
+		else
+			pageSession.setAttribute("msg", "Usuario ja existe");
+		
 		pageSession.setAttribute("PaginaAtual", "Login");
 		SalvarDadosUsuarios();
 	}
@@ -279,7 +282,10 @@ public class Server extends HttpServlet
 			pageSession.setAttribute("PaginaAtual", "Inicio");
 		}
 		else		
+		{
 			pageSession.setAttribute("PaginaAtual", "Login");
+			pageSession.setAttribute("msg", "Usuario ou senha Invalidos!");
+		}
 	}
 	private void gerarSenha(String Preferencial)
 	{
@@ -305,21 +311,27 @@ public class Server extends HttpServlet
 		pageContext.setAttribute("controleSenhas", cs, pageContext.APPLICATION_SCOPE);
 		SalvarDadosSenhas();
 		pageSession.setAttribute("PaginaAtual", "Sistema");
+		pageSession.setAttribute("msg", "Sistema Reiniciado");
 	}
 	private void reiniciarContagem()
 	{
 		cs.ResetarSenha();
 		pageSession.setAttribute("PaginaAtual", "Sistema");
+		pageSession.setAttribute("msg", "Contagem Reiniciada");
 	}
 	private void proximaSenha()
 	{
 		pageSession.setAttribute("senhaChamada", cs.chamarProximaSenha(sl));
-		cs.InserirSenhaGerente(sl.getNome(),(Senha)pageSession.getAttribute("senhaChamada"));
+		if(pageSession.getAttribute("senhaChamada") != null)
+			cs.InserirSenhaGerente(sl.getNome(),(Senha)pageSession.getAttribute("senhaChamada"));
+		else
+			pageSession.setAttribute("msg", "Não ha mais senhas na fila!");
 		pageSession.setAttribute("PaginaAtual", "Sistema");
 	}
 	private void clienteAusente()
 	{
 		cs.atrasarSenha((Senha)pageSession.getAttribute("senhaChamada"));
 		pageSession.setAttribute("PaginaAtual", "Sistema");
+		pageSession.setAttribute("msg", "Cliente marcado como ausente!");
 	}
 }

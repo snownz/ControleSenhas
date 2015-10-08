@@ -53,5 +53,11 @@ public class Login implements java.io.Serializable
 		return this.nome.equals(l.getNome()) && this.senha.equals(l.getSenha()); 
 	}
 	
+	public boolean exists(Object o)
+	{
+		Login l = (Login)o;
+		return this.nome.equals(l.getNome()); 
+	}
+	
 	
 }

@@ -31,10 +31,26 @@ public class GerenciaLogin implements java.io.Serializable
 		this.addLogin(laux);
 	}
 	
-	public void addLogin(Login l)
+	public boolean addLogin(Login l)
 	{
-		if(this.existeLogin(l) == null)
+		if(this.existeCadastro(l) == null)
+		{
 			this.listaLogin.add(l);
+			return true;
+		}
+		return false;
+	}
+	
+	public Login existeCadastro(Login l)
+	{
+		Iterator it = this.listaLogin.iterator();
+		while(it.hasNext())
+		{
+			Login laux = (Login)it.next();
+			if(l.exists(laux))
+				return laux;
+		}
+		return null;			
 	}
 	
 	public Login existeLogin(Login l)

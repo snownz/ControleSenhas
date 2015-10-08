@@ -21,6 +21,9 @@
 			"<input type='hidden' name='paginaSolicitada' id='paginaSolicitada' value='Cadastrar'>"+ 
 			"</form>";
 		session.setAttribute("Menu",Menu);
+		session.setAttribute("SereverError", "");
+		session.setAttribute("Titulo","Inicio");
+		session.setAttribute("Pagina","");
 	}
 	
 	if(session.getAttribute("TimeToRefresh") != null)

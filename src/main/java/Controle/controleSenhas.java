@@ -141,9 +141,8 @@ public class controleSenhas implements java.io.Serializable
 				this.PUltimaSenhaNormalChamada = i;
 				return this.FilaSenhasNormal[i];
 			}
-		}
-		Senha nullo = new Senha(-1, false, new Date(), new Login());
-		return nullo ;
+		}		
+		return null ;
 	}
 
 	public void renovarSenha(Senha s)
@@ -154,28 +153,28 @@ public class controleSenhas implements java.io.Serializable
 		if(s.getPreferencial())	
 		{
 			int pos = this.PUltimaSenhaPreferencialChamada;
-			int multa = pos - s.getPos();
-			s.setPos(multa);
+			int multa = pos - s.getPos();			
 			this.FilaSenhasPreferencial[s.getPos()] = null;
-			for(int i = 0; i < multa; i++)
+			for(int i = 0; i < multa && i+s.getPos() < this.PUltimaSenhaPreferencialChamada; i++)
 			{
 				int _pos = i+s.getPos();
 				this.FilaSenhasPreferencial[_pos] = this.FilaSenhasPreferencial[_pos+1];
 			}
-			this.FilaSenhasPreferencial[s.getPos()+multa] = s;
+			s.setPos(multa);
+			this.FilaSenhasPreferencial[s.getPos()] = s;
 		}
 		else
 		{
 			int pos = this.PUltimaSenhaNormalChamada;
 			int multa = pos - s.getPos();
-			s.setPos(multa);
-			this.FilaSenhasNormal[s.getPos()] = null;
-			for(int i = 0; i < multa; i++)
+			this.FilaSenhasNormal[s.getPos()] = null;						
+			for(int i = 0; i < multa && i+s.getPos() < this.PUltimaSenhaNormalChamada; i++)
 			{
 				int _pos = i+s.getPos();
 				this.FilaSenhasNormal[_pos] = this.FilaSenhasNormal[_pos+1];
 			}
-			this.FilaSenhasNormal[s.getPos()+multa] = s;
+			s.setPos(multa);			
+			this.FilaSenhasNormal[s.getPos()] = s;
 		}
 	}
 	
