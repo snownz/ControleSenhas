@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -40,20 +41,19 @@ public class Server extends HttpServlet
 	    s  = (Senha)pageSession.getAttribute("Senha");
 	}
 	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
-	{
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+	{		
         initVar(request, response);
+        pageSession.setAttribute("SereverError", "");
         try {checkGerenciaLogin();} 
-        catch (ClassNotFoundException e) 
+        catch (Exception e) 
         {
-        	e.printStackTrace();
-        	return;
+        	pageSession.setAttribute("SereverError", e.getMessage());
 		}
         try {checkControleSenhas();}
-        catch (ClassNotFoundException e) 
+        catch (Exception e) 
         {
-			e.printStackTrace();
-			return;
+        	pageSession.setAttribute("SereverError", e.getMessage());
 		}       
         
         String cadastrado = request.getParameter("cadastroOk");
@@ -61,32 +61,119 @@ public class Server extends HttpServlet
         
         if(cadastrado != null)
         {
-    		cadastrar(request.getParameter("inLogin"), request.getParameter("inSenha"));
+        	try
+        	{
+        		cadastrar(request.getParameter("inLogin"), request.getParameter("inSenha"), request.getParameter("Gerencia") != null);
+        	}
+        	catch(Exception e)
+        	{
+        		pageSession.setAttribute("SereverError", e.getMessage());        		
+        	}
     		request.removeAttribute("cadastroOk");
         }
         if(login != null)
         {
-        	login(request.getParameter("inLogin"), request.getParameter("inSenha"));
+        	try
+        	{
+        		login(request.getParameter("inLogin"), request.getParameter("inSenha"));
+        	}
+        	catch(Exception e)
+        	{
+        		pageSession.setAttribute("SereverError", e.getMessage());        		
+        	}
     		request.removeAttribute("loginOk");
-        }        
+        } 
+        
         if(sl != null)
 		{
 			if(!sl.getGerente())
 			{
 				if(request.getParameter("gerarOk")!= null)
 				{
-					gerarSenha(request.getParameter("Preferencial"));
+					try
+					{
+						gerarSenha(request.getParameter("Preferencial"));
+					}
+		        	catch(Exception e)
+		        	{
+		        		pageSession.setAttribute("SereverError", e.getMessage());        		
+		        	}
 					request.removeAttribute("gerarOk");
 				}
 				if(request.getParameter("cancelarOk")!= null && cs.getSenhaUsuario(sl) != null)
 				{
-					cancelarSenha();
+					try
+					{
+						cancelarSenha();
+					}
+		        	catch(Exception e)
+		        	{
+		        		pageSession.setAttribute("SereverError", e.getMessage());        		
+		        	}
 					request.removeAttribute("cancelarOk");
 				}
 				if(request.getParameter("renovarOk")!= null)
 				{
-					renovarSenha();
+					try
+					{
+						renovarSenha();
+					}
+		        	catch(Exception e)
+		        	{
+		        		pageSession.setAttribute("SereverError", e.getMessage());        		
+		        	}
 					request.removeAttribute("renovarOk");
+				}
+			}
+			else
+			{
+				if(request.getParameter("actrs")!= null)
+				{
+					try
+					{
+						reiniciarSistema();
+					}
+		        	catch(Exception e)
+		        	{
+		        		pageSession.setAttribute("SereverError", e.getMessage());        		
+		        	}
+					request.removeAttribute("actrs");
+				}
+				if(request.getParameter("actrc")!= null)
+				{
+					try	
+					{
+						reiniciarContagem();
+					}
+		        	catch(Exception e)
+		        	{
+		        		pageSession.setAttribute("SereverError", e.getMessage());        		
+		        	}
+					request.removeAttribute("actrc");
+				}
+				if(request.getParameter("actm")!= null)
+				{
+					try
+					{
+						clienteAusente();
+					}
+		        	catch(Exception e)
+		        	{
+		        		pageSession.setAttribute("SereverError", e.getMessage());        		
+		        	}
+					request.removeAttribute("actm");
+				}
+				if(request.getParameter("actc")!= null)
+				{
+					try
+					{
+						proximaSenha();
+					}
+		        	catch(Exception e)
+		        	{
+		        		pageSession.setAttribute("SereverError", e.getMessage());        		
+		        	}
+					request.removeAttribute("actc");
 				}
 			}
 		}          
@@ -95,8 +182,15 @@ public class Server extends HttpServlet
         pageSession.setAttribute("RetServer", "");
         if (!response.isCommitted())
         {  
-        	   RequestDispatcher dispatcher = request.getRequestDispatcher("Cliente");   
-        	   dispatcher.forward(request, response);   
+        	  RequestDispatcher dispatcher = request.getRequestDispatcher("Cliente");   
+        	  try
+        	  {
+        		 dispatcher.forward(request, response);   
+        	  }
+	          catch(Exception e)
+	          {
+	           	pageSession.setAttribute("SereverError", e.getMessage());        		
+	          }
         }  
 	}
 
@@ -106,41 +200,68 @@ public class Server extends HttpServlet
 		gl = (GerenciaLogin) pageContext.getAttribute("gerenciaLogin", pageContext.APPLICATION_SCOPE);
 		if(gl == null)
 		{
-			File f = new File(path + "controleUsuarios.ser");
+			File f = new File(path + "gerenciaLogin.ser");
 			if(!f.exists())
+			{
 				gl = GerenciaLogin.getInstancia();
+				SalvarDadosUsuarios();
+			}
 			else
-				gl = (GerenciaLogin) SalvarRecuperarDados.Recuperar(path + "controleUsuarios.ser");
+			{
+				gl = (GerenciaLogin) SalvarRecuperarDados.Recuperar(path + "gerenciaLogin.ser");
+				if(gl == null)
+				{
+					f.delete();
+					checkGerenciaLogin();
+				}
+			}
 			pageContext.setAttribute("gerenciaLogin", gl, pageContext.APPLICATION_SCOPE);
-		}
-		SalvarRecuperarDados.Salvar(path+"controleUsuarios.ser", gl);
-			
+		}	
 	}
 	private void checkControleSenhas() throws ClassNotFoundException, IOException
 	{
-		cs = (controleSenhas) pageContext.getAttribute("controleSenhas", pageContext.APPLICATION_SCOPE);
-		
+		cs = (controleSenhas) pageContext.getAttribute("controleSenhas", pageContext.APPLICATION_SCOPE);		
 		if(cs == null)
 		{
-			File f = new File(path+"controleSenhas.ser");
+			File f = new File(path + "controleSenhas.ser");
 			if(!f.exists())
+			{
 				cs = controleSenhas.getInstancia();
+				SalvarDadosSenhas();
+			}
 			else
-				cs = (controleSenhas) SalvarRecuperarDados.Recuperar(path+"dados.ser");
+			{
+				cs = (controleSenhas) SalvarRecuperarDados.Recuperar(path+"controleSenhas.ser");
+				if(cs == null)
+				{
+					f.delete();
+					checkControleSenhas();
+				}
+			}
 			pageContext.setAttribute("controleSenhas", cs, pageContext.APPLICATION_SCOPE);
-		}
-		SalvarRecuperarDados.Salvar(path+"controleSenhas.ser", cs);			
+		}				
 	}
 	
-	private void cadastrar(String Login, String Senha)
+	private void SalvarDadosSenhas() throws IOException
+	{
+		SalvarRecuperarDados.Salvar(path+"controleSenhas.ser", cs);	
+	}
+	private void SalvarDadosUsuarios() throws IOException
+	{
+		SalvarRecuperarDados.Salvar(path+"controleUsuarios.ser", gl);
+	}
+	
+	
+	private void cadastrar(String Login, String Senha, boolean gerencia) throws IOException
 	{
 		Login l = new Login();
 		l.setEstado(false);
 		l.setNome(Login);
 		l.setSenha(Senha);
-		l.setGerente(false);
+		l.setGerente(gerencia);
 		gl.addLogin(l);		
 		pageSession.setAttribute("PaginaAtual", "Login");
+		SalvarDadosUsuarios();
 	}
 	private void login(String Login, String Senha)
 	{
@@ -176,5 +297,29 @@ public class Server extends HttpServlet
 		cs.renovarSenha(cs.getSenhaUsuario(sl));	
 		pageSession.setAttribute("PaginaAtual", "Senha");
 	}
-	
+	private void reiniciarSistema() throws IOException
+	{
+		File f = new File(path + "controleSenhas.ser");
+		f.delete();
+		cs = controleSenhas.getInstancia();
+		pageContext.setAttribute("controleSenhas", cs, pageContext.APPLICATION_SCOPE);
+		SalvarDadosSenhas();
+		pageSession.setAttribute("PaginaAtual", "Sistema");
+	}
+	private void reiniciarContagem()
+	{
+		cs.ResetarSenha();
+		pageSession.setAttribute("PaginaAtual", "Sistema");
+	}
+	private void proximaSenha()
+	{
+		pageSession.setAttribute("senhaChamada", cs.chamarProximaSenha(sl));
+		cs.InserirSenhaGerente(sl.getNome(),(Senha)pageSession.getAttribute("senhaChamada"));
+		pageSession.setAttribute("PaginaAtual", "Sistema");
+	}
+	private void clienteAusente()
+	{
+		cs.atrasarSenha((Senha)pageSession.getAttribute("senhaChamada"));
+		pageSession.setAttribute("PaginaAtual", "Sistema");
+	}
 }

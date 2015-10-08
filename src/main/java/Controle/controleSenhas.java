@@ -19,11 +19,9 @@ public class controleSenhas implements java.io.Serializable
 	private int   		PUltimaSenhaNormalChamada;
 	private int   		PUltimaSenhaPreferencialChamada;
 		
-	private ArrayList Gerentes = new ArrayList();
-	
+	private ArrayList Gerentes = new ArrayList();	
 	private static controleSenhas cs = new controleSenhas();
-	
-		
+			
 	public static controleSenhas getInstancia()
 	{
 		return controleSenhas.cs;
@@ -33,7 +31,7 @@ public class controleSenhas implements java.io.Serializable
 	{
 		Gerente g = new Gerente();
 		g.setUsuario(l);
-		Gerentes.add(g);
+		this.Gerentes.add(g);
 	}
 	
 	public void removerGerente(String Nome)
@@ -74,21 +72,21 @@ public class controleSenhas implements java.io.Serializable
 	
 	public boolean usuarioContemSenha(Login l)
 	{
-		for(int i = 0; i < PUltimaSenhaPreferencial; i++)
+		for(int i = 0; i < this.PUltimaSenhaPreferencial; i++)
 		{
-			if(    !FilaSenhasPreferencial[i].getChamada() 
-			   &&  !FilaSenhasPreferencial[i].getCancelada()
-			   &&   FilaSenhasPreferencial[i].getUsuario().getNome().equals(l.getNome()))
+			if(    !this.FilaSenhasPreferencial[i].getChamada() 
+			   &&  !this.FilaSenhasPreferencial[i].getCancelada()
+			   &&   this.FilaSenhasPreferencial[i].getUsuario().getNome().equals(l.getNome()))
 			{				
 				return true;
 			}
 		}
 		
-		for(int i = 0; i < PUltimaSenhaNormal; i++)
+		for(int i = 0; i < this.PUltimaSenhaNormal; i++)
 		{
-			if(    !FilaSenhasNormal[i].getChamada() 
-					   &&  !FilaSenhasNormal[i].getCancelada()
-					   &&   FilaSenhasNormal[i].getUsuario().getNome().equals(l.getNome()))
+			if(    !this.FilaSenhasNormal[i].getChamada() 
+					   &&  !this.FilaSenhasNormal[i].getCancelada()
+					   &&   this.FilaSenhasNormal[i].getUsuario().getNome().equals(l.getNome()))
 					{				
 						return true;
 					}
@@ -98,14 +96,15 @@ public class controleSenhas implements java.io.Serializable
 	
 	public Senha getSenhaUsuario(Login l)
 	{
-		for(int i = 0; i < PUltimaSenhaPreferencial; i++)		
-			if(  FilaSenhasPreferencial[i].getUsuario().equals(l))						
-				return FilaSenhasPreferencial[i];	
+		for(int i = 0; i < this.PUltimaSenhaPreferencial; i++)	
+			if(this.FilaSenhasPreferencial[i].getUsuario() != null)
+				if( this.FilaSenhasPreferencial[i].getUsuario().equals(l))						
+					return this.FilaSenhasPreferencial[i];	
 		
-		for(int i = 0; i < PUltimaSenhaNormal; i++)		
-			if( FilaSenhasNormal[i].getUsuario().equals(l))							
-				return FilaSenhasNormal[i];
-			
+		for(int i = 0; i < this.PUltimaSenhaNormal; i++)	
+			if(this.FilaSenhasNormal[i].getUsuario() != null)
+				if( this.FilaSenhasNormal[i].getUsuario().equals(l))							
+					return this.FilaSenhasNormal[i];		
 		
 		return null;
 	}
@@ -117,30 +116,30 @@ public class controleSenhas implements java.io.Serializable
 	
 	public int getUltimaSenhaP()
 	{
-		return PUltimaSenhaPreferencial;
+		return this.PUltimaSenhaPreferencial;
 	}
 	
 	public Senha chamarProximaSenha(Login g)
 	{
-		for(int i = 0; i < PUltimaSenhaPreferencial; i++)
+		for(int i = 0; i < this.PUltimaSenhaPreferencial; i++)
 		{
-			if(!FilaSenhasPreferencial[i].getChamada() && !FilaSenhasPreferencial[i].getCancelada())
+			if(!this.FilaSenhasPreferencial[i].getChamada() && !this.FilaSenhasPreferencial[i].getCancelada())
 			{
-				FilaSenhasPreferencial[i].setNomeGerente(g.getNome());
-				FilaSenhasPreferencial[i].setChamada(true);
-				PUltimaSenhaPreferencialChamada = i;
-				return FilaSenhasPreferencial[i];
+				this.FilaSenhasPreferencial[i].setNomeGerente(g.getNome());
+				this.FilaSenhasPreferencial[i].setChamada(true);
+				this.PUltimaSenhaPreferencialChamada = i;
+				return this.FilaSenhasPreferencial[i];
 			}
 		}
 		
-		for(int i = 0; i < PUltimaSenhaNormal; i++)
+		for(int i = 0; i < this.PUltimaSenhaNormal; i++)
 		{
-			if(!FilaSenhasNormal[i].getChamada() && !FilaSenhasNormal[i].getCancelada())
+			if(!this.FilaSenhasNormal[i].getChamada() && !this.FilaSenhasNormal[i].getCancelada())
 			{
-				FilaSenhasNormal[i].setNomeGerente(g.getNome());
-				FilaSenhasNormal[i].setChamada(true);
-				PUltimaSenhaNormalChamada = i;
-				return FilaSenhasNormal[i];
+				this.FilaSenhasNormal[i].setNomeGerente(g.getNome());
+				this.FilaSenhasNormal[i].setChamada(true);
+				this.PUltimaSenhaNormalChamada = i;
+				return this.FilaSenhasNormal[i];
 			}
 		}
 		Senha nullo = new Senha(-1, false, new Date(), new Login());
@@ -154,73 +153,73 @@ public class controleSenhas implements java.io.Serializable
 		s.setChamada(false);
 		if(s.getPreferencial())	
 		{
-			int pos = PUltimaSenhaPreferencialChamada;
+			int pos = this.PUltimaSenhaPreferencialChamada;
 			int multa = pos - s.getPos();
 			s.setPos(multa);
-			FilaSenhasPreferencial[s.getPos()] = null;
+			this.FilaSenhasPreferencial[s.getPos()] = null;
 			for(int i = 0; i < multa; i++)
 			{
 				int _pos = i+s.getPos();
-				FilaSenhasPreferencial[_pos] = FilaSenhasPreferencial[_pos+1];
+				this.FilaSenhasPreferencial[_pos] = this.FilaSenhasPreferencial[_pos+1];
 			}
-			FilaSenhasPreferencial[s.getPos()+multa] = s;
+			this.FilaSenhasPreferencial[s.getPos()+multa] = s;
 		}
 		else
 		{
-			int pos = PUltimaSenhaNormalChamada;
+			int pos = this.PUltimaSenhaNormalChamada;
 			int multa = pos - s.getPos();
 			s.setPos(multa);
-			FilaSenhasNormal[s.getPos()] = null;
+			this.FilaSenhasNormal[s.getPos()] = null;
 			for(int i = 0; i < multa; i++)
 			{
 				int _pos = i+s.getPos();
-				FilaSenhasNormal[_pos] = FilaSenhasNormal[_pos+1];
+				this.FilaSenhasNormal[_pos] = this.FilaSenhasNormal[_pos+1];
 			}
-			FilaSenhasNormal[s.getPos()+multa] = s;
+			this.FilaSenhasNormal[s.getPos()+multa] = s;
 		}
 	}
 	
 	public void atrasarSenha(Senha s)
 	{
 		if(s.getPreferencial())		
-			FilaSenhasPreferencial[s.getPos()].setAtrasada(true);
+			this.FilaSenhasPreferencial[s.getPos()].setAtrasada(true);
 		else
-			FilaSenhasNormal[s.getPos()].setAtrasada(true);
+			this.FilaSenhasNormal[s.getPos()].setAtrasada(true);
 	}
 	
 	public void cancelarSenha(Senha s)
 	{
 		if(s.getPreferencial())		
 		{
-			FilaSenhasPreferencial[s.getPos()].setCancelada(true);
-			//FilaSenhasPreferencial[s.getPos()].setUsuario(null);
+			this.FilaSenhasPreferencial[s.getPos()].setCancelada(true);
+			FilaSenhasPreferencial[s.getPos()].setUsuario(null);
 		}
 		else
 		{
-			FilaSenhasNormal[s.getPos()].setCancelada(true);
-			//FilaSenhasNormal[s.getPos()].setUsuario(null);
+			this.FilaSenhasNormal[s.getPos()].setCancelada(true);
+			FilaSenhasNormal[s.getPos()].setUsuario(null);
 		}
 	}
 		
 	public int getUltimaSenhaN()
 	{
-		return PUltimaSenhaNormal;
+		return this.PUltimaSenhaNormal;
 	}
 	
 	public controleSenhas()
 	{
 		this.FilaSenhasNormal 			= new Senha[9999];
-		this.FilaSenhasPreferencial 	= new Senha[9999];
-		
+		this.FilaSenhasPreferencial 	= new Senha[9999];		
 		this.PUltimaSenhaNormal 		= 0;
-		this.PUltimaSenhaPreferencial 	= 0;
-		
+		this.PUltimaSenhaPreferencial 	= 0;		
 	}
-	
-	
+		
 	public void ResetarSenha()
 	{
-		this.cs = new controleSenhas();		
+		this.FilaSenhasNormal 			= new Senha[9999];
+		this.FilaSenhasPreferencial 	= new Senha[9999];		
+		this.PUltimaSenhaNormal 		= 0;
+		this.PUltimaSenhaPreferencial 	= 0;		
 	}
 		
 	public Senha[] getFilaPreferencial()
@@ -238,27 +237,27 @@ public class controleSenhas implements java.io.Serializable
 		Senha[] proximas = new Senha[num];
 		int index = 0;
 		
-		for(int i = 0; i < PUltimaSenhaPreferencial; i++)
+		for(int i = 0; i < this.PUltimaSenhaPreferencial; i++)
 		{
-			if(!FilaSenhasPreferencial[i].getChamada() 
-					&& !FilaSenhasPreferencial[i].getCancelada()
-					&& !FilaSenhasPreferencial[i].getAtrasada())
+			if(!this.FilaSenhasPreferencial[i].getChamada() 
+					&& !this.FilaSenhasPreferencial[i].getCancelada()
+					&& !this.FilaSenhasPreferencial[i].getAtrasada())
 			{
-				proximas[index] = FilaSenhasPreferencial[i];
+				proximas[index] = this.FilaSenhasPreferencial[i];
 				index++;
 				if(index == num)
 					return proximas;
 			}
 		}
 		
-		for(int i = 0; i < PUltimaSenhaNormal; i++)
+		for(int i = 0; i < this.PUltimaSenhaNormal; i++)
 		{
-			if(!FilaSenhasNormal[i].getChamada() 
-					&& !FilaSenhasNormal[i].getCancelada()
-					&& !FilaSenhasNormal[i].getAtrasada()
+			if(!this.FilaSenhasNormal[i].getChamada() 
+					&& !this.FilaSenhasNormal[i].getCancelada()
+					&& !this.FilaSenhasNormal[i].getAtrasada()
 					)
 			{
-				proximas[index] = FilaSenhasNormal[i];
+				proximas[index] = this.FilaSenhasNormal[i];
 				index++;
 				if(index == num)
 					return proximas;
@@ -266,7 +265,6 @@ public class controleSenhas implements java.io.Serializable
 		}
 		return proximas;
 	}
-	
 	
 	public Senha GerarSenha(Login u, boolean Preferencial)
 	{

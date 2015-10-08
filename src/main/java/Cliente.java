@@ -54,6 +54,7 @@ public class Cliente extends HttpServlet
 		{
 			request.getRequestDispatcher("Server").forward(request, response);
 			pageSession.setAttribute("RetServer", null);
+			return;
 		}
 		initVar(request, response);
 		
@@ -111,33 +112,37 @@ public class Cliente extends HttpServlet
 	{
 		if(page != null)
 		{
-			if(page.contains("Cadastro"))
+			if(page.equals("Cadastro"))
 			{
 				setPageCadastro();
 			}
-			else if(page.contains("Login"))
+			else if(page.equals("Login"))
 			{
 				setPageLogin();
 			}
-			else if(page.contains("Fila"))
+			else if(page.equals("Fila"))
 			{
 				setPageFila();
 			}
-			else if(page.contains("Senha"))
+			else if(page.equals("Senha"))
 			{
 				setPageSenha();
 			}
-			else if(page.contains("Sistema"))
+			else if(page.equals("Sistema"))
 			{
 				setPageSistema();
 			}
-			else if(page.contains("Sair"))
+			else if(page.equals("Sair"))
 			{
 				gl.alterarEstado(sl, false);
 				if(sl.getGerente() && cs.getGerentes().size() > 0)
 					cs.removerGerente(sl.getNome());
-				pageSession.setAttribute("login", null);
-				setPageSistema();
+				sl = null;
+				pageSession.setAttribute("Login", sl);
+				pageSession.setAttribute("Senha", null);
+				pageSession.setAttribute("PaginaAtual", null);
+				setMenu();	
+				setPage("Inicio");
 			}
 			else
 			{
@@ -183,6 +188,7 @@ public class Cliente extends HttpServlet
 					"<label>[Senha]:</label>&emsp;"+
 					"<input type='password' name='inSenha'><br><br>"+
 					"<input type='hidden' name='cadastroOk' value='true'>"+
+					"<input type=\"checkbox\" name=\"Gerencia\"><label>Gerente</label><br><br>"+
 					"<input type='submit' name='cadastrar' value='Cadastrar'>"+
 				"</form>"+
 				"</div>";
@@ -215,7 +221,7 @@ public class Cliente extends HttpServlet
 		pageSession.setAttribute("TimeToRefresh", 3);
 		Site = "";
 		pageSession.setAttribute("Titulo", "Fila");	
-		if(sl == null)
+		if(sl != null)
 		{
 			int maxProxima = 10;
 			Senha[] sp = cs.getFilaPreferencial(), 
@@ -340,16 +346,6 @@ public class Cliente extends HttpServlet
 						"<input type=\"submit\"  value=\"Gerar Senha\">"+
 					"</form>";
 		}
-		else if(se.getCancelada() || se.getChamada())
-		{
-			Site += "<h3>Voce ainda não solicitou uma senha para o atendimento!</h3>"+
-					"<h3>Para solicitar a senha utilize o formulario abaixo</h3>"+
-					"<form method=\"post\" action=\"Cliente\">"+
-						"<input type=\"hidden\" name=\"gerarO\" value=\"true\">"+
-						"<input type=\"checkbox\" name=\"Preferencial\" value=\"disabled\"><label>Atendimento Preferencial</label><br><br>"+
-						"<input type=\"submit\"  value=\"Gerar Senha\">"+
-					"</form>";
-		}
 		else if(se.getAtrasada())
 		{
 			Site += "<h3>Sua senha ja foi chamada!</h3>"+
@@ -364,6 +360,16 @@ public class Cliente extends HttpServlet
 						"<input type=\"submit\" value=\"Cancelar Senha\">"+
 						"</form>";
 		}
+		else if(se.getCancelada() || se.getChamada())
+		{
+			Site += "<h3>Voce ainda não solicitou uma senha para o atendimento!</h3>"+
+					"<h3>Para solicitar a senha utilize o formulario abaixo</h3>"+
+					"<form method=\"post\" action=\"Cliente\">"+
+						"<input type=\"hidden\" name=\"gerarOk\" value=\"true\">"+
+						"<input type=\"checkbox\" name=\"Preferencial\" value=\"disabled\"><label>Atendimento Preferencial</label><br><br>"+
+						"<input type=\"submit\"  value=\"Gerar Senha\">"+
+					"</form>";
+		}		
 		else
 		{ 
 			Site += "<h3>Voce já solicitou uma senha para o atendimento!</h3>"+

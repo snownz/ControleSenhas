@@ -34,11 +34,10 @@
 	
 	<div id="footer">
 		Copyright © Desenv Fernandes
-	</div>	
-<html> 
-<body>	
+	</div>
+	<div><%=session.getAttribute("SereverError")%></div>
+</body>	
+<html> 	
 <form action="Cliente" method="post">    
     <input type="submit" value="Utilizar Aplicativo"/>
 </form>
-</body>
-</html>
