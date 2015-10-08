@@ -248,19 +248,59 @@ public class Cliente extends HttpServlet
 			Site += "Cliente";
 			Site += "</td>";
 			Site += "</tr>";
+			boolean estaNaFila = false;
+			Senha ls = null;
+			if(sl != null)							
+				ls = cs.getSenhaUsuario(sl);			
 			for(int i = 0; i < maxProxima; i++)
 			{
 	        	 if(st[i] != null)
 	        	 {
-	        		 Site += "<tr>";
-	        		 Site += "<td >";
+	        		 if(ls != null)
+	        		 {
+		        		 if(st[i].equals(ls))
+		        		 {
+		        			 estaNaFila = true; 
+		        			 Site += "<tr>";
+			        		 Site += "<td style = 'background: red; color: white;'>";			        		 
+		        		 }
+		        		 else
+		        		 {
+		        			 Site += "<tr>";
+			        		 Site += "<td >";			        		
+		        		 }
+	        		 }
+	        		 else
+	        		 {
+		        		 Site += "<tr>";
+		        		 Site += "<td >";		        		
+	        		 }
 	        		 Site += st[i].getSenha() ;
 	        		 Site += "</td>";
 	        		 Site += "<td>";
 	        		 Site += st[i].getUsuario().getNome();
 	        		 Site += "</td> ";
-	        		 Site += "</tr> ";
+	        		 Site += "</tr> ";	
 	        	 }
+			}
+			if(!estaNaFila && sl != null && ls != null)
+			{
+				Site += "<tr>";
+	       		Site += "<td >";
+	       		Site += "...";
+	       		Site += "</td>";
+	       		Site += "<td>";
+	       		Site += "...";
+	       		Site += "</td> ";
+	       		Site += "</tr> ";
+	       		Site += "<tr>";
+	       		Site += "<td style = 'background: red;'>";
+	       		Site += ls.getSenha() ;
+	       		Site += "</td>";
+	       		Site += "<td>";
+	       		Site += ls.getUsuario().getNome();
+	       		Site += "</td> ";
+	       		Site += "</tr> ";
 			}
 	        Site += "</table>";
 	        Site += "</div> ";

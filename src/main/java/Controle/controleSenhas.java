@@ -118,7 +118,7 @@ public class controleSenhas implements java.io.Serializable
 	{
 		return this.PUltimaSenhaPreferencial;
 	}
-	
+		
 	public Senha chamarProximaSenha(Login g)
 	{
 		for(int i = 0; i < this.PUltimaSenhaPreferencial; i++)
@@ -266,8 +266,33 @@ public class controleSenhas implements java.io.Serializable
 		return proximas;
 	}
 	
+	public Senha[] recadastrarSenhas(Senha[] _s)
+	{
+		Senha[] s = new Senha[9999];
+		int pos = -1;
+		for(int i = 0; i < _s.length; i++)
+		{
+			if(_s[i] != null)
+				if(!_s[i].getCancelada() || (_s[i].getChamada() && !_s[i].getAtrasada()))				
+					s[pos+=1] = _s[i];					
+		}
+		return s;
+	}
+	
 	public Senha GerarSenha(Login u, boolean Preferencial)
 	{
+		if(this.PUltimaSenhaNormal == 9999)
+		{
+			this.FilaSenhasNormal = recadastrarSenhas(this.FilaSenhasNormal);
+			this.PUltimaSenhaNormal = 1;
+			while(this.FilaSenhasNormal[this.PUltimaSenhaNormal] != null){this.PUltimaSenhaNormal++;}
+		}
+		if(this.PUltimaSenhaPreferencial == 9999)
+		{
+			this.FilaSenhasPreferencial = recadastrarSenhas(this.FilaSenhasPreferencial);
+			this.PUltimaSenhaPreferencial = 1;
+			while(this.FilaSenhasPreferencial[this.PUltimaSenhaPreferencial] != null){this.PUltimaSenhaPreferencial++;}
+		}
 		Senha s  = null;
 		if(!Preferencial)
 		{
