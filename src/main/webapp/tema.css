@@ -94,6 +94,7 @@ a{
 a:hover {
 	-webkit-border-radius:10px 0px 10px 0px ;
 	border-radius:10px 0px 10px 0px ;
+	cursor: pointer;
 }
 
 #letreiroExterno

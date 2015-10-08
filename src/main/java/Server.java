@@ -263,7 +263,7 @@ public class Server extends HttpServlet
 		else
 			pageSession.setAttribute("msg", "Usuario ja existe");
 		
-		pageSession.setAttribute("PaginaAtual", "Login");
+		pageSession.setAttribute("PaginaAtual", "Cadastro");
 		SalvarDadosUsuarios();
 	}
 	private void login(String Login, String Senha)
