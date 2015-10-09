@@ -3,8 +3,7 @@
 <%@ page import="javax.servlet.http.HttpServletRequest"%>
 <% 
 	if(session.getAttribute("startUpPath") == null)
-		session.setAttribute("startUpPath", getServletContext().getRealPath("/"));	
-
+		session.setAttribute("startUpPath", getServletContext().getRealPath("/"));
 	if(session.getAttribute("Menu") == null)
 	{
 		String Menu = "<script type='text/javascript'>"+

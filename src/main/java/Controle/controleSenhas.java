@@ -238,7 +238,7 @@ public class controleSenhas implements java.io.Serializable
 		
 		for(int i = 0; i < this.PUltimaSenhaPreferencial; i++)
 		{
-			if(!this.FilaSenhasPreferencial[i].getChamada() 
+			if(		!this.FilaSenhasPreferencial[i].getChamada() 
 					&& !this.FilaSenhasPreferencial[i].getCancelada()
 					&& !this.FilaSenhasPreferencial[i].getAtrasada())
 			{
@@ -293,8 +293,11 @@ public class controleSenhas implements java.io.Serializable
 			while(this.FilaSenhasPreferencial[this.PUltimaSenhaPreferencial] != null){this.PUltimaSenhaPreferencial++;}
 		}
 		Senha s  = null;
+		if(this.getSenhaUsuario(u)!= null)
+			this.cancelarSenha(this.getSenhaUsuario(u));
 		if(!Preferencial)
 		{
+			
 			s = new Senha(this.PUltimaSenhaNormal, Preferencial, new Date(), u);
 			s.setPos(this.PUltimaSenhaNormal);
 			this.FilaSenhasNormal[this.PUltimaSenhaNormal] = s;

@@ -134,11 +134,21 @@ public class Cliente extends HttpServlet
 			}
 			else if(page.equals("Sair"))
 			{
-				gl.alterarEstado(sl, false);
-				if(sl.getGerente() && cs.getGerentes().size() > 0)
-					cs.removerGerente(sl.getNome());
-				sl = null;
-				pageSession.setAttribute("Login", sl);
+				if(sl != null)
+				{
+					gl.alterarEstado(sl, false);
+					try
+					{					
+						if(sl.getGerente() && cs.getGerentes().size() > 0)						
+							cs.removerGerente(sl.getNome());						
+					}
+					catch(Exception e)
+					{
+							pageSession.setAttribute("SereverError", e.getMessage());  
+					}
+					sl = null;
+				}
+				pageSession.setAttribute("Login", null);
 				pageSession.setAttribute("Senha", null);
 				pageSession.setAttribute("PaginaAtual", null);
 				setMenu();	
@@ -260,7 +270,7 @@ public class Cliente extends HttpServlet
 	        	 {
 	        		 if(ls != null)
 	        		 {
-		        		 if(st[i].equals(ls))
+		        		 if(st[i].equals(ls) )
 		        		 {
 		        			 estaNaFila = true; 
 		        			 Site += "<tr>";
@@ -287,22 +297,25 @@ public class Cliente extends HttpServlet
 			}
 			if(!estaNaFila && sl != null && ls != null)
 			{
-				Site += "<tr>";
-	       		Site += "<td >";
-	       		Site += "...";
-	       		Site += "</td>";
-	       		Site += "<td>";
-	       		Site += "...";
-	       		Site += "</td> ";
-	       		Site += "</tr> ";
-	       		Site += "<tr>";
-	       		Site += "<td style = 'background: red;'>";
-	       		Site += ls.getSenha() ;
-	       		Site += "</td>";
-	       		Site += "<td>";
-	       		Site += ls.getUsuario().getNome();
-	       		Site += "</td> ";
-	       		Site += "</tr> ";
+				if(!ls.getAtrasada() && !ls.getCancelada() && !ls.getChamada())
+				{
+					Site += "<tr>";
+		       		Site += "<td >";
+		       		Site += "...";
+		       		Site += "</td>";
+		       		Site += "<td>";
+		       		Site += "...";
+		       		Site += "</td> ";
+		       		Site += "</tr> ";
+		       		Site += "<tr>";
+		       		Site += "<td style = 'background: red;'>";
+		       		Site += ls.getSenha() ;
+		       		Site += "</td>";
+		       		Site += "<td>";
+		       		Site += ls.getUsuario().getNome();
+		       		Site += "</td> ";
+		       		Site += "</tr> ";
+				}
 			}
 	        Site += "</table>";
 	        Site += "</div> ";
@@ -425,21 +438,21 @@ public class Cliente extends HttpServlet
 	private void setPageSistema()
 	{
 		pageSession.setAttribute("TimeToRefresh", 9999999);
-		Site = "<h3>"+pageSession.getAttribute("msg")+"</h3>";
+		Site = "<h3>"+pageSession.getAttribute("msg")+"</h3><br>";
 		pageSession.setAttribute("Titulo", "Sistema");	
-		Site += "<form method=\"post\" action=\"Cliente\"><input name=\"actrs\" type=\"hidden\" value=\"rt\"><input type=\"submit\" value=\"Reiniciar Sistema\"></form>"+
-				"<form method=\"post\" action=\"Cliente\"><input name=\"actrc\" type=\"hidden\" value=\"rt\"><input type=\"submit\" value=\"Reiniciar Contagem\"></form>";
 		if(pageSession.getAttribute("senhaChamada") != null)
 		{
 			Senha satual = (Senha)pageSession.getAttribute("senhaChamada");
-			Site +="<h3>Senha: "+satual.getSenha()+" Info: " +satual.getInfo()+"</h3>";
-			Site +="<form method='post' action='Cliente'><input name='actm' type='hidden' value='m'><input type='submit' value='Cliente ausente'></form><br>"+
-					"<h3>"+pageSession.getAttribute("msg")+"<\\h3>";
+			if(satual != null)
+				Site +="<h3>Ultima senha chamada: "+satual.getSenha()+" Info: " +satual.getInfo()+"</h3>";
+			Site +="<form method='post' action='Cliente'><input name='actm' type='hidden' value='m'><input type='submit' value='Cliente ausente'></form><br>";
 		}
 		else
 		{
 			Site +="<h2>Não ha senhas registradas</h2>";
 		}
+		Site += "<form method=\"post\" action=\"Cliente\"><input name=\"actrs\" type=\"hidden\" value=\"rt\"><input type=\"submit\" value=\"Reiniciar Sistema\"></form><br>"+
+				"<form method=\"post\" action=\"Cliente\"><input name=\"actrc\" type=\"hidden\" value=\"rt\"><input type=\"submit\" value=\"Reiniciar Contagem\"></form><br>";
 		Site += "<form method=\"post\" action=\"Cliente\"><input name=\"actc\" type=\"hidden\" value=\"c\"><input type=\"submit\" value=\"Chamar Proxima Senha\"></form>";
 	}
 	
